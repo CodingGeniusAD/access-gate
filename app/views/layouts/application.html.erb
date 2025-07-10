@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Access Gate" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <!-- Header with Logo -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+      <div class="container">
+        <%= link_to root_path, class: "navbar-brand d-flex align-items-center" do %>
+          <img src="<%= asset_path('logo.png') %>" alt="AccessGate Logo" height="40" class="me-2">
+          <span class="fw-bold text-primary">AccessGate</span>
+        <% end %>
+        
+        <div class="navbar-nav ms-auto">
+          <% if user_signed_in? %>
+            <%= link_to "Dashboard", root_path, class: "nav-link" %>
+            <%= link_to "Sign Out", destroy_user_session_path, data: { turbo_method: :delete }, class: "nav-link" %>
+          <% else %>
+            <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+            <%= link_to "Sign Up", new_user_registration_path, class: "nav-link" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <% if flash.any? %>
+      <div class="container mt-3">
+        <% flash.each do |type, message| %>
+          <% bs_class = case type.to_sym
+            when :notice then 'alert-success'
+            when :alert then 'alert-danger'
+            else 'alert-info'
+          end %>
+          <div class="alert <%= bs_class %> alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    <%= yield %>
+  </body>
+</html>

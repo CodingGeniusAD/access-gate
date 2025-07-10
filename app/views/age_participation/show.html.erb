@@ -1,0 +1,14 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="mb-4">Age-Based Content</h1>
+          <p class="lead">Your age group: <span class="badge bg-info text-dark"><%= current_user.age_group %></span></p>
+          <p class="fw-bold">Filtered content:</p>
+          <pre class="bg-light p-3 rounded border"><%= @content %></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

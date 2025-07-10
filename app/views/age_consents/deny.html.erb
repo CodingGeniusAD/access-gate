@@ -1,0 +1,8 @@
+<div class="container mt-5">
+  <div class="alert alert-warning">
+    <%= flash[:notice] || 'Consent denied.' %>
+  </div>
+  <% if flash[:alert] %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
+</div>

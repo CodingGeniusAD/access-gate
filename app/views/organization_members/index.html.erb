@@ -1,0 +1,60 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Organization Members</h4>
+          <div>
+            <%= link_to 'Add Member', new_organization_organization_member_path(@organization), class: 'btn btn-success me-2' %>
+            <%= link_to 'Back to Organization', organization_path(@organization), class: 'btn btn-outline-secondary' %>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @memberships.each do |membership| %>
+                <tr>
+                  <td><%= membership.user.email %></td>
+                  <td><%= membership.user.date_of_birth.present? ? ((Time.zone.now.to_date - membership.user.date_of_birth).to_i / 365) : 'N/A' %></td>
+                  <td>
+                    <%= membership.role %>
+                    <% if @organization.owner_id == membership.user_id %>
+                      <span class="badge bg-primary ms-1">Owner</span>
+                    <% end %>
+                  </td>
+                  <td><%= membership.status %></td>
+                  <td>
+                    <%= link_to 'Edit', edit_organization_organization_member_path(@organization, membership), class: 'btn btn-sm btn-outline-primary me-1' %>
+                    <% if @organization.owner_id == membership.user_id || membership.user_id == current_user.id %>
+                      <button class="btn btn-sm btn-danger" disabled>Remove</button>
+                    <% else %>
+                      <%= form_with url: organization_organization_member_path(@organization, membership), method: :delete, class: 'd-inline' do %>
+                        <%= submit_tag 'Remove', class: 'btn btn-sm btn-danger', data: { confirm: 'Are you sure?' } %>
+                      <% end %>
+                    <% end %>
+                    <%# Transfer ownership button for owner, for other admins only %>
+                    <% if @organization.owner_id == current_user.id && membership.admin? && membership.user_id != @organization.owner_id %>
+                      <%= form_with url: transfer_ownership_organization_organization_members_path(@organization), method: :post, class: 'd-inline' do %>
+                        <%= hidden_field_tag :user_id, membership.user_id %>
+                        <%= submit_tag 'Make Owner', class: 'btn btn-sm btn-warning ms-1', data: { confirm: 'Are you sure you want to transfer ownership?' } %>
+                      <% end %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,5 @@
+class AddOwnerIdToOrganizations < ActiveRecord::Migration[8.0]
+  def change
+    add_column :organizations, :owner_id, :integer
+  end
+end

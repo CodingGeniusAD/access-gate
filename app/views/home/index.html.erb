@@ -1,0 +1,37 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="mb-4">Welcome to AccessGate</h1>
+
+          <% if user_signed_in? %>
+            <p>Hello, <strong><%= current_user.email %></strong>!</p>
+            <%= button_to 'Sign out', destroy_user_session_path, method: :delete, class: 'btn btn-outline-danger mb-3' %>
+          <% else %>
+            <div class="mb-3">
+              <%= link_to 'Sign in', new_user_session_path, class: 'btn btn-primary me-2' %>
+              <%= link_to 'Sign up', new_user_registration_path, class: 'btn btn-outline-primary' %>
+            </div>
+          <% end %>
+
+          <hr>
+
+          <h2 class="mb-3">Features</h2>
+          <ul class="list-group mb-4">
+            <li class="list-group-item">Organization-based access control with roles (admin, moderator, member)</li>
+            <li class="list-group-item">Custom participation rules per organization</li>
+            <li class="list-group-item">Organization-level analytics</li>
+            <li class="list-group-item">Age-based participation and content rules</li>
+            <li class="list-group-item">Parental consent workflow for minors</li>
+          </ul>
+
+          <div class="d-flex gap-2">
+            <%= link_to 'Organizations', organizations_path, class: 'btn btn-outline-success' %>
+            <%= link_to 'Age-Based Content', age_participation_path, class: 'btn btn-outline-info' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,2 @@
+module AgeConsentsHelper
+end

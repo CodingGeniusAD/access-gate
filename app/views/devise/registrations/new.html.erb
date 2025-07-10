@@ -1,0 +1,45 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <img src="<%= asset_path('logo.png') %>" alt="AccessGate Logo" height="60" class="mb-3">
+            <h2 class="mb-0">Sign Up</h2>
+          </div>
+          <%= form_with(model: resource, as: resource_name, url: registration_path(resource_name), html: { class: 'mb-3' }) do |f| %>
+            <div class="mb-3">
+              <%= f.label :email, class: 'form-label' %>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' %>
+            </div>
+            <div class="mb-3">
+              <%= f.label :password, class: 'form-label' %>
+              <%= f.password_field :password, autocomplete: "new-password", class: 'form-control' %>
+            </div>
+            <div class="mb-3">
+              <%= f.label :password_confirmation, class: 'form-label' %>
+              <%= f.password_field :password_confirmation, autocomplete: "new-password", class: 'form-control' %>
+            </div>
+            <div class="mb-3">
+              <%= f.label :date_of_birth, class: 'form-label' %>
+              <%= f.date_field :date_of_birth, required: true, class: 'form-control' %>
+              <div class="form-text">Required for age verification</div>
+            </div>
+            <div class="mb-3">
+              <%= f.label :parent_email, 'Parent Email (required for minors)', class: 'form-label' %>
+              <%= f.email_field :parent_email, class: 'form-control' %>
+              <div class="form-text">If you are under 18, a parent email is required for consent</div>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+              <%= f.submit "Sign up", class: 'btn btn-success' %>
+            </div>
+          <% end %>
+          <div class="d-flex justify-content-between">
+            <%= link_to "Sign in", new_session_path(resource_name), class: 'link-primary' %>
+            <%= link_to "Forgot your password?", new_password_path(resource_name), class: 'link-secondary' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

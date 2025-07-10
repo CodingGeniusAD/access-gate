@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <h1>Organizations</h1>
+
+  <div class="mb-3 d-flex gap-2">
+    <%= link_to 'New Organization', new_organization_path, class: 'btn btn-success' %>
+    <%= link_to 'Back', root_path, class: 'btn btn-secondary' %>
+  </div>
+
+  <table class="table table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Name</th>
+        <th>Membership Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @organizations.each do |org| %>
+        <% membership = org.memberships.find_by(user_id: current_user.id) %>
+        <tr>
+          <td><%= org.name %></td>
+          <td>
+            <% if membership %>
+              <% status = membership.status.to_s.titleize %>
+              <% if membership.suspended? %>
+                <span class="badge bg-danger"><%= status %></span>
+              <% elsif membership.active? %>
+                <span class="badge bg-success"><%= status %></span>
+              <% else %>
+                <span class="badge bg-secondary"><%= status %></span>
+              <% end %>
+            <% else %>
+              <span class="badge bg-secondary">None</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'Show', organization_path(org), class: 'btn btn-sm btn-outline-info me-1' %>
+            <% if policy(org).update? %>
+              <%= link_to 'Edit', edit_organization_path(org), class: 'btn btn-sm btn-outline-primary me-1' %>
+            <% end %>
+            <% if policy(org).destroy? %>
+              <%= link_to 'Destroy', organization_path(org), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-outline-danger' %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

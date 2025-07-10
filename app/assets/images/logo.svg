@@ -1,0 +1,18 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simple key icon -->
+  <rect x="5" y="15" width="8" height="10" rx="1" fill="#0d6efd"/>
+  <rect x="13" y="18" width="15" height="4" fill="#0d6efd"/>
+  <rect x="18" y="15" width="3" height="3" fill="#0d6efd"/>
+  <rect x="23" y="22" width="3" height="3" fill="#0d6efd"/>
+  
+  <!-- Simple gate icon -->
+  <rect x="35" y="10" width="3" height="25" fill="#6c757d"/>
+  <rect x="47" y="10" width="3" height="25" fill="#6c757d"/>
+  <rect x="35" y="10" width="15" height="3" fill="#6c757d"/>
+  <rect x="37" y="16" width="11" height="2" fill="#6c757d"/>
+  <rect x="37" y="22" width="11" height="2" fill="#6c757d"/>
+  
+  <!-- Text -->
+  <text x="60" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#212529">Access</text>
+  <text x="60" y="32" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#0d6efd">Gate</text>
+</svg>

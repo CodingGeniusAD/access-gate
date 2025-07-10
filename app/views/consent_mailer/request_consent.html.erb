@@ -1,0 +1,16 @@
+<h2>Parental Consent Request</h2>
+<p>
+  Hello,<br>
+  Your child, <strong><%= @user.email %></strong>, has registered for AccessGate and requires your consent to participate.
+</p>
+<p>
+  Please review and respond:
+</p>
+<ul>
+  <li><a href="<%= @approve_url %>">Approve Participation</a></li>
+  <li><a href="<%= @deny_url %>">Deny Participation</a></li>
+</ul>
+<p>
+  Thank you!<br>
+  AccessGate Team
+</p> 
