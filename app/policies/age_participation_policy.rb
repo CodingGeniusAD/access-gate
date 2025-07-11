@@ -1,8 +1,9 @@
 class AgeParticipationPolicy < ApplicationPolicy
   def access?
     return false unless user
-    # Example: Only adults and teens can access certain content
-    user.adult? || user.teen?
+    # All authenticated users can access the age participation page
+    # Content filtering happens within the page based on user's age group
+    true
   end
 
   def child_content?
@@ -16,4 +17,4 @@ class AgeParticipationPolicy < ApplicationPolicy
   def adult_content?
     user.adult?
   end
-end 
+end

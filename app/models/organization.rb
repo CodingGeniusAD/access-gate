@@ -1,7 +1,7 @@
 class Organization < ApplicationRecord
-  has_many :memberships
+  has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
-  belongs_to :owner, class_name: 'User', optional: true
+  belongs_to :owner, class_name: "User", optional: true
 
   PARTICIPATION_RULE_HANDLERS = {
     "age" => ->(user, rule, org) {
@@ -17,9 +17,6 @@ class Organization < ApplicationRecord
         nil
       end
       age && (min.nil? || age >= min) && (max.nil? || age <= max)
-    },
-    "role" => ->(user, rule, org) {
-      Membership.find_by(user: user, organization: org)&.role.to_s == rule["value"]
     },
     "email_domain" => ->(user, rule, org) {
       user.email.ends_with?("@#{rule['domain']}")
@@ -44,9 +41,9 @@ class Organization < ApplicationRecord
     rules = participation_rules
     # Normalize rules to array of hashes
     if rules.is_a?(String)
-      rules = [{ "type" => "legacy", "value" => rules }]
+      rules = [ { "type" => "legacy", "value" => rules } ]
     elsif rules.is_a?(Hash)
-      rules = [rules]
+      rules = [ rules ]
     elsif rules.nil?
       rules = []
     end

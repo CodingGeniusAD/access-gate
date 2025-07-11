@@ -4,17 +4,6 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h1 class="mb-4">Welcome to AccessGate</h1>
-
-          <% if user_signed_in? %>
-            <p>Hello, <strong><%= current_user.email %></strong>!</p>
-            <%= button_to 'Sign out', destroy_user_session_path, method: :delete, class: 'btn btn-outline-danger mb-3' %>
-          <% else %>
-            <div class="mb-3">
-              <%= link_to 'Sign in', new_user_session_path, class: 'btn btn-primary me-2' %>
-              <%= link_to 'Sign up', new_user_registration_path, class: 'btn btn-outline-primary' %>
-            </div>
-          <% end %>
-
           <hr>
 
           <h2 class="mb-3">Features</h2>

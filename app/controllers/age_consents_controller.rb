@@ -4,9 +4,9 @@ class AgeConsentsController < ApplicationController
     consent = AgeConsent.find_by(approval_token: params[:token])
     if consent&.pending?
       consent.update(status: :approved)
-      flash[:notice] = 'Parental consent approved. The user can now participate.'
+      flash[:notice] = "Parental consent approved. The user can now participate."
     else
-      flash[:alert] = 'Invalid or already processed consent request.'
+      flash[:alert] = "Invalid or already processed consent request."
     end
     render :approve
   end
@@ -15,9 +15,9 @@ class AgeConsentsController < ApplicationController
     consent = AgeConsent.find_by(approval_token: params[:token])
     if consent&.pending?
       consent.update(status: :rejected)
-      flash[:notice] = 'Parental consent denied. The user cannot participate.'
+      flash[:notice] = "Parental consent denied. The user cannot participate."
     else
-      flash[:alert] = 'Invalid or already processed consent request.'
+      flash[:alert] = "Invalid or already processed consent request."
     end
     render :deny
   end

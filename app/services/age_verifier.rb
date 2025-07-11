@@ -15,4 +15,4 @@ class AgeVerifier
       :adult
     end
   end
-end 
+end

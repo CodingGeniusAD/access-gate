@@ -12,4 +12,4 @@ module HasRoles
   def member?
     role_member?
   end
-end 
+end

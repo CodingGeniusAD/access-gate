@@ -1,0 +1,65 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">Create New Content</h2>
+        </div>
+        <div class="card-body">
+          <%= form_with(model: @content, local: true) do |form| %>
+            <% if @content.errors.any? %>
+              <div class="alert alert-danger">
+                <h4 class="alert-heading"><%= pluralize(@content.errors.count, "error") %> prohibited this content from being saved:</h4>
+                <ul class="mb-0">
+                  <% @content.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= form.label :title, class: "form-label" %>
+              <%= form.text_field :title, class: "form-control", placeholder: "Enter content title" %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :content_type, class: "form-label" %>
+              <%= form.select :content_type, Content::CONTENT_TYPES.map { |type| [type.capitalize, type] }, {}, class: "form-select" %>
+              <small class="form-text text-muted">Select the type of content you're creating.</small>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :age_group, "Age Restriction", class: "form-label" %>
+              <%= form.select :age_group, @available_age_groups, {}, class: "form-select" %>
+              <small class="form-text text-muted">
+                <strong>Important:</strong> Choose the appropriate age restriction for your content. 
+                Users can only access content suitable for their age group.
+              </small>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :body, class: "form-label" %>
+              <%= form.text_area :body, class: "form-control", rows: 8, placeholder: "Enter your content here..." %>
+              <small class="form-text text-muted">Minimum 10 characters required.</small>
+            </div>
+
+            <div class="alert alert-warning">
+              <h6>⚠️ Age Restriction Guidelines</h6>
+              <ul class="mb-0">
+                <li><strong>Child:</strong> Educational, family-friendly content suitable for all ages</li>
+                <li><strong>Teen:</strong> Content that may include mild themes, suitable for teens and adults</li>
+                <li><strong>Adult:</strong> Mature content, complex topics, or content requiring adult judgment</li>
+              </ul>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <%= link_to "Cancel", contents_path, class: "btn btn-outline-secondary" %>
+              <%= form.submit "Create Content", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -26,7 +26,6 @@
               <%= form.text_area :participation_rules, value: @organization.participation_rules.is_a?(String) ? @organization.participation_rules : JSON.pretty_generate(@organization.participation_rules || []), class: "form-control", rows: 3 %>
               <small class="form-text text-muted">
                 Example: <code>[{"type": "age", "min": 18}]</code> for adults only.<br>
-                Multiple rules: <code>[{"type": "age", "min": 13}, {"type": "role", "value": "admin"}]</code>
               </small>
             </div>
             <div class="mb-3">

@@ -2,44 +2,109 @@
   <h1>Organizations</h1>
 
   <div class="mb-3 d-flex gap-2">
-    <%= link_to 'New Organization', new_organization_path, class: 'btn btn-success' %>
+    <% if user_signed_in? %>
+      <%= link_to 'New Organization', new_organization_path, class: 'btn btn-success' %>
+    <% end %>
     <%= link_to 'Back', root_path, class: 'btn btn-secondary' %>
   </div>
+
+  <% if !user_signed_in? %>
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle"></i>
+      <strong>Join Organizations:</strong> Sign in to request membership and access organization features.
+    </div>
+  <% end %>
 
   <table class="table table-striped">
     <thead class="table-light">
       <tr>
         <th>Name</th>
-        <th>Membership Status</th>
+        <th>Participation Rules</th>
+        <th>Members</th>
+        <th>Your Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <% @organizations.each do |org| %>
-        <% membership = org.memberships.find_by(user_id: current_user.id) %>
+        <% if user_signed_in? %>
+          <% membership = org.memberships.find_by(user_id: current_user.id) %>
+        <% end %>
         <tr>
           <td><%= org.name %></td>
           <td>
-            <% if membership %>
-              <% status = membership.status.to_s.titleize %>
-              <% if membership.suspended? %>
-                <span class="badge bg-danger"><%= status %></span>
-              <% elsif membership.active? %>
-                <span class="badge bg-success"><%= status %></span>
+            <small class="text-muted">
+              <% if org.participation_rules.present? %>
+                <% rules = org.participation_rules.is_a?(String) ? JSON.parse(org.participation_rules) : org.participation_rules %>
+                <% rules.each do |rule| %>
+                  <% if rule["type"] == "age" %>
+                    <% if rule["min"] && rule["max"] %>
+                      Age: <%= rule["min"] %>-<%= rule["max"] %> years
+                    <% elsif rule["min"] %>
+                      Min age: <%= rule["min"] %> years
+                    <% elsif rule["max"] %>
+                      Max age: <%= rule["max"] %> years
+                    <% end %>
+                  <% elsif rule["type"] == "role" %>
+                    Role: <%= rule["value"] %>
+                  <% end %>
+                <% end %>
               <% else %>
-                <span class="badge bg-secondary"><%= status %></span>
+                Open to all
+              <% end %>
+            </small>
+          </td>
+          <td><%= org.memberships.count %> members</td>
+          <td>
+            <% if user_signed_in? %>
+              <% if membership %>
+                <% if membership.suspended? %>
+                  <span class="badge bg-danger">Suspended</span>
+                <% elsif membership.active? %>
+                  <span class="badge bg-success">Active</span>
+                <% elsif membership.pending? %>
+                  <span class="badge bg-warning">Pending</span>
+                <% elsif membership.rejected? %>
+                  <span class="badge bg-secondary">Rejected</span>
+                <% end %>
+                <br><small class="text-muted"><%= membership.role.to_s.titleize %></small>
+              <% else %>
+                <span class="badge bg-secondary">Not a member</span>
               <% end %>
             <% else %>
-              <span class="badge bg-secondary">None</span>
+              <span class="badge bg-light text-dark">Sign in to join</span>
             <% end %>
           </td>
           <td>
-            <%= link_to 'Show', organization_path(org), class: 'btn btn-sm btn-outline-info me-1' %>
-            <% if policy(org).update? %>
-              <%= link_to 'Edit', edit_organization_path(org), class: 'btn btn-sm btn-outline-primary me-1' %>
-            <% end %>
-            <% if policy(org).destroy? %>
-              <%= link_to 'Destroy', organization_path(org), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-outline-danger' %>
+            <%= link_to 'View Details', organization_path(org), class: 'btn btn-sm btn-outline-info me-1' %>
+            
+            <% if user_signed_in? %>
+              <% if membership %>
+                <!-- User is already a member -->
+                <% if policy(org).update? %>
+                  <%= link_to 'Edit', edit_organization_path(org), class: 'btn btn-sm btn-outline-primary me-1' %>
+                <% end %>
+                <% if policy(org).destroy? %>
+                  <%= link_to 'Delete', organization_path(org), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-outline-danger' %>
+                <% end %>
+              <% else %>
+                <!-- User is not a member - show request button -->
+                <% if policy(org).request_membership? %>
+                  <% if org.allows_participation?(current_user) %>
+                    <%= button_to 'Request Membership', request_membership_organization_path(org), 
+                        method: :post, 
+                        class: 'btn btn-sm btn-primary mt-1',
+                        data: { confirm: 'Submit membership request for this organization?' } %>
+                  <% else %>
+                    <button class="btn btn-sm btn-secondary" disabled title="You do not meet the participation requirements">
+                      Not Eligible
+                    </button>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <!-- Guest user -->
+              <%= link_to 'Sign In to Join', new_user_session_path, class: 'btn btn-sm btn-outline-primary' %>
             <% end %>
           </td>
         </tr>

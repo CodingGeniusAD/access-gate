@@ -3,58 +3,155 @@
     <div class="col-md-10">
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="mb-0">Organization Members</h4>
+          <h4 class="mb-0">
+            <% if policy(@organization).manage_members? %>
+              Organization Members
+            <% else %>
+              View Members
+            <% end %>
+          </h4>
           <div>
-            <%= link_to 'Add Member', new_organization_organization_member_path(@organization), class: 'btn btn-success me-2' %>
+            <% if policy(@organization).manage_members? %>
+              <%= link_to 'Add Member', new_organization_organization_member_path(@organization), class: 'btn btn-success me-2' %>
+            <% end %>
             <%= link_to 'Back to Organization', organization_path(@organization), class: 'btn btn-outline-secondary' %>
           </div>
         </div>
         <div class="card-body p-0">
-          <table class="table table-striped mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Email</th>
-                <th>Age</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @memberships.each do |membership| %>
-                <tr>
-                  <td><%= membership.user.email %></td>
-                  <td><%= membership.user.date_of_birth.present? ? ((Time.zone.now.to_date - membership.user.date_of_birth).to_i / 365) : 'N/A' %></td>
-                  <td>
-                    <%= membership.role %>
-                    <% if @organization.owner_id == membership.user_id %>
-                      <span class="badge bg-primary ms-1">Owner</span>
+          <% if policy(@organization).manage_members? %>
+            <div class="alert alert-info m-3">
+              <i class="fas fa-info-circle"></i>
+              <strong>Full Access:</strong> You can manage all members and view detailed analytics.
+            </div>
+          <% elsif policy(@organization).view_members? %>
+            <div class="alert alert-info m-3">
+              <i class="fas fa-eye"></i>
+              <strong>Read-Only Access:</strong> You can view member information but cannot manage members. Contact an administrator for member management.
+            </div>
+          <% end %>
+
+          <!-- Pending Membership Requests Section -->
+          <% if policy(@organization).manage_members? && @pending_requests.any? %>
+            <div class="m-3">
+              <h5 class="text-warning">
+                <i class="fas fa-clock"></i>
+                Pending Membership Requests (<%= @pending_requests.count %>)
+              </h5>
+              <div class="table-responsive">
+                <table class="table table-sm table-warning">
+                  <thead class="table-warning">
+                    <tr>
+                      <th>Email</th>
+                      <th>Age</th>
+                      <th>Requested Role</th>
+                      <th>Request Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @pending_requests.each do |membership| %>
+                      <tr>
+                        <td><%= membership.user.email %></td>
+                        <td><%= membership.user.date_of_birth.present? ? ((Time.zone.now.to_date - membership.user.date_of_birth).to_i / 365) : 'N/A' %></td>
+                        <td><%= membership.role %></td>
+                        <td><%= membership.created_at.strftime('%Y-%m-%d %H:%M') %></td>
+                        <td>
+                          <%= button_to 'Approve', approve_request_organization_organization_member_path(@organization, membership), 
+                              method: :patch, 
+                              class: 'btn btn-sm btn-success me-1',
+                              data: { confirm: 'Approve this membership request?' } %>
+                          <%= button_to 'Reject', reject_request_organization_organization_member_path(@organization, membership), 
+                              method: :patch, 
+                              class: 'btn btn-sm btn-danger mt-1',
+                              data: { confirm: 'Reject this membership request?' } %>
+                        </td>
+                      </tr>
                     <% end %>
-                  </td>
-                  <td><%= membership.status %></td>
-                  <td>
-                    <%= link_to 'Edit', edit_organization_organization_member_path(@organization, membership), class: 'btn btn-sm btn-outline-primary me-1' %>
-                    <% if @organization.owner_id == membership.user_id || membership.user_id == current_user.id %>
-                      <button class="btn btn-sm btn-danger" disabled>Remove</button>
-                    <% else %>
-                      <%= form_with url: organization_organization_member_path(@organization, membership), method: :delete, class: 'd-inline' do %>
-                        <%= submit_tag 'Remove', class: 'btn btn-sm btn-danger', data: { confirm: 'Are you sure?' } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Active Members Section -->
+          <div class="m-3">
+            <h5>
+              <i class="fas fa-users"></i>
+              Active Members (<%= @memberships.where.not(status: Membership::STATUSES[:pending]).count %>)
+            </h5>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Role</th>
+                    <th>Membership Status</th>
+                    <% if policy(@organization).manage_members? %>
+                      <th>Actions</th>
+                    <% end %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @memberships.where.not(status: Membership::STATUSES[:pending]).each do |membership| %>
+                    <tr>
+                      <td><%= membership.user.email %></td>
+                      <td><%= membership.user.date_of_birth.present? ? ((Time.zone.now.to_date - membership.user.date_of_birth).to_i / 365) : 'N/A' %></td>
+                      <td>
+                        <%= membership.role %>
+                        <% if @organization.owner_id == membership.user_id %>
+                          <span class="badge bg-primary ms-1">Owner</span>
+                        <% end %>
+                      </td>
+                      <td>
+                        <% if membership.active? %>
+                          <span class="badge bg-success">Active</span>
+                        <% elsif membership.suspended? %>
+                          <span class="badge bg-danger">Suspended</span>
+                        <% elsif membership.pending? %>
+                          <span class="badge bg-warning">Pending</span>
+                        <% elsif membership.status == :rejected %>
+                          <span class="badge bg-secondary">Rejected</span>
+                        <% else %>
+                          <span class="badge bg-light text-dark"><%= membership.status.to_s.titleize %></span>
+                        <% end %>
+                      </td>
+                      <% if policy(@organization).manage_members? %>
+                        <td>
+                          <%= link_to 'Edit', edit_organization_organization_member_path(@organization, membership), class: 'btn btn-sm btn-outline-primary me-1' %>
+                          <% if @organization.owner_id == membership.user_id || membership.user_id == current_user.id %>
+                            <button class="btn btn-sm btn-danger" disabled>Remove</button>
+                          <% else %>
+                            <%= form_with url: organization_organization_member_path(@organization, membership), method: :delete, class: 'd-inline' do %>
+                              <%= submit_tag 'Remove', class: 'btn btn-sm btn-danger', data: { confirm: 'Are you sure?' } %>
+                            <% end %>
+                          <% end %>
+                          <%# Transfer ownership button for owner, for other admins only %>
+                          <% if @organization.owner_id == current_user.id && membership.admin? && membership.user_id != @organization.owner_id %>
+                            <%= form_with url: transfer_ownership_organization_organization_members_path(@organization), method: :post, class: 'd-inline' do %>
+                              <%= hidden_field_tag :user_id, membership.user_id %>
+                              <%= submit_tag 'Make Owner', class: 'btn btn-sm btn-warning ms-1', data: { confirm: 'Are you sure you want to transfer ownership?' } %>
+                            <% end %>
+                          <% end %>
+                        </td>
                       <% end %>
-                    <% end %>
-                    <%# Transfer ownership button for owner, for other admins only %>
-                    <% if @organization.owner_id == current_user.id && membership.admin? && membership.user_id != @organization.owner_id %>
-                      <%= form_with url: transfer_ownership_organization_organization_members_path(@organization), method: :post, class: 'd-inline' do %>
-                        <%= hidden_field_tag :user_id, membership.user_id %>
-                        <%= submit_tag 'Make Owner', class: 'btn btn-sm btn-warning ms-1', data: { confirm: 'Are you sure you want to transfer ownership?' } %>
-                      <% end %>
-                    <% end %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div> 
+</div>
+
+<% content_for :scripts do %>
+  <script>
+    function canManageMembership(membership) {
+      // This will be replaced by server-side logic
+      return true;
+    }
+  </script>
+<% end %> 

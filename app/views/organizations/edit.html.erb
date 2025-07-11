@@ -27,7 +27,6 @@
                 <%= form.text_area :participation_rules, value: @organization.participation_rules.is_a?(String) ? @organization.participation_rules : JSON.pretty_generate(@organization.participation_rules || []), class: "form-control", rows: 3 %>
                 <small class="form-text text-muted">
                   Example: <code>[{"type": "age", "min": 18}]</code> for adults only.<br>
-                  Multiple rules: <code>[{"type": "age", "min": 13}, {"type": "role", "value": "admin"}]</code>
                 </small>
               </div>
               <div class="mb-3">
@@ -36,6 +35,12 @@
               </div>
               <div class="d-flex gap-2">
                 <%= form.submit 'Update Organization', class: "btn btn-outline-success" %>
+                <% if policy(@organization).destroy? %>
+                  <%= link_to 'Delete Organization', organization_path(@organization), 
+                      method: :delete, 
+                      data: { confirm: 'Are you sure? This action cannot be undone and will delete the entire organization and all its data.' }, 
+                      class: 'btn btn-outline-danger' %>
+                <% end %>
                 <%= link_to 'Back', organizations_path, class: 'btn btn-outline-secondary' %>
               </div>
             <% end %>

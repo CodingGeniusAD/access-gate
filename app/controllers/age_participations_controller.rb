@@ -3,6 +3,9 @@ class AgeParticipationsController < ApplicationController
 
   def show
     authorize :age_participation, :access?
-    @content = ContentFilter.new(current_user).filter("This is adult and teen content.")
+    @content_filter = ContentFilter.new(current_user)
+    @content_summary = @content_filter.content_summary
+    @recommended_content = @content_filter.recommended_content
+    @accessible_content = @content_filter.accessible_content.limit(10)
   end
-end 
+end

@@ -1,0 +1,66 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0"><%= @content.title %></h2>
+            <div>
+              <% if policy(@content).update? %>
+                <%= link_to "Edit", edit_content_path(@content), class: "btn btn-sm btn-outline-primary" %>
+              <% end %>
+              <% if policy(@content).destroy? %>
+                <%= link_to "Delete", content_path(@content), 
+                    method: :delete, 
+                    data: { confirm: "Are you sure?" }, 
+                    class: "btn btn-sm btn-outline-danger" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <span class="badge bg-secondary"><%= @content.content_type.capitalize %></span>
+              <span class="badge <%= @content.child_content? ? 'bg-success' : @content.teen_content? ? 'bg-warning text-dark' : 'bg-danger' %>">
+                <%= @content.age_restriction_text %>
+              </span>
+            </div>
+            <div class="col-md-6 text-end">
+              <small class="text-muted">
+                Created: <%= @content.created_at.strftime("%B %d, %Y") %>
+              </small>
+            </div>
+          </div>
+
+          <div class="content-body mb-4">
+            <%= simple_format(@content.body) %>
+          </div>
+
+          <div class="alert alert-info">
+            <h6>📋 Content Information</h6>
+            <ul class="mb-0">
+              <li><strong>Type:</strong> <%= @content.content_type.capitalize %></li>
+              <li><strong>Age Restriction:</strong> <%= @content.age_restriction_text %></li>
+              <li><strong>Accessible by:</strong> 
+                <% case @content.age_group %>
+                <% when :child %>
+                  All users (children, teens, and adults)
+                <% when :teen %>
+                  Teens and adults only
+                <% when :adult %>
+                  Adults only
+                <% end %>
+              </li>
+            </ul>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <%= link_to "← Back to Content Library", contents_path, class: "btn btn-outline-secondary" %>
+            <%= link_to "Age-Appropriate Content", age_participation_path, class: "btn btn-outline-primary" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

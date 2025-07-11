@@ -6,18 +6,51 @@
           <h4 class="mb-0">Edit Member</h4>
         </div>
         <div class="card-body">
+          <% if @organization.owner_id == current_user.id %>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <strong>Owner Access:</strong> You can assign any role to this member.
+            </div>
+          <% elsif admin? %>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <strong>Admin Access:</strong> You can assign any role to this member.
+            </div>
+          <% elsif moderator? %>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Moderator Access:</strong> You can only assign member roles to regular members.
+            </div>
+          <% end %>
+          
           <%= form_with model: @membership, url: organization_organization_member_path(@organization, @membership), local: true do |f| %>
             <div class="mb-3">
               <%= f.label :role, 'Role', class: 'form-label' %>
-              <%= f.select :role, Membership::ROLES.keys.map { |r| [r.to_s.titleize, r] }, {}, class: 'form-select' %>
+              <% if @organization.owner_id == current_user.id || admin? %>
+                <%= f.select :role, Membership::ROLES.keys.map { |r| [r.to_s.titleize, r] }, {}, class: 'form-select' %>
+              <% elsif moderator? %>
+                <% if @membership.member? %>
+                  <%= f.select :role, [['Member', 'member']], {}, class: 'form-select' %>
+                <% else %>
+                  <div class="alert alert-danger">
+                    <i class="fas fa-ban"></i>
+                    <strong>Access Denied:</strong> You can only manage regular members, not admins or moderators.
+                  </div>
+                  <%= f.select :role, [['Member', 'member']], {}, class: 'form-select', disabled: true %>
+                <% end %>
+              <% end %>
             </div>
             <div class="mb-3">
               <%= f.label :status, 'Status', class: 'form-label' %>
               <%= f.select :status, Membership::STATUSES.keys.map { |s| [s.to_s.titleize, s] }, {}, class: 'form-select' %>
             </div>
             <div class="d-flex gap-2">
-              <%= f.submit 'Update Member', class: 'btn btn-primary' %>
-              <%= link_to 'Back', organization_organization_members_path(@organization), class: 'btn btn-outline-secondary' %>
+              <% if moderator? && !@membership.member? %>
+                <%= link_to 'Back', organization_organization_members_path(@organization), class: 'btn btn-outline-secondary' %>
+              <% else %>
+                <%= f.submit 'Update Member', class: 'btn btn-primary' %>
+                <%= link_to 'Back', organization_organization_members_path(@organization), class: 'btn btn-outline-secondary' %>
+              <% end %>
             </div>
           <% end %>
         </div>

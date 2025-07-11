@@ -6,6 +6,42 @@
           <h4 class="mb-0">Add Member</h4>
         </div>
         <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Participation Rule:</strong>
+            <% if @organization.participation_rules.present? %>
+              <% rules = @organization.participation_rules.is_a?(String) ? JSON.parse(@organization.participation_rules) : @organization.participation_rules %>
+              <% rules.each do |rule| %>
+                <% if rule["type"] == "age" %>
+                  <% if rule["min"] && rule["max"] %>
+                    Age: <%= rule["min"] %>-<%= rule["max"] %> years
+                  <% elsif rule["min"] %>
+                    Min age: <%= rule["min"] %> years
+                  <% elsif rule["max"] %>
+                    Max age: <%= rule["max"] %> years
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% else %>
+              Open to all ages
+            <% end %>
+          </div>
+          <% if @organization.owner_id == current_user.id %>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <strong>Owner Access:</strong> You can assign any role to new members.
+            </div>
+          <% elsif admin? %>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i>
+              <strong>Admin Access:</strong> You can assign any role to new members.
+            </div>
+          <% elsif moderator? %>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Moderator Access:</strong> You can only assign member roles to new members.
+            </div>
+          <% end %>
+          
           <%= form_with model: @membership, url: organization_organization_members_path(@organization), local: true do |f| %>
             <div class="mb-3">
               <%= label_tag :user_id, 'User', class: 'form-label' %>
@@ -13,7 +49,11 @@
             </div>
             <div class="mb-3">
               <%= label_tag :role, 'Role', class: 'form-label' %>
-              <%= select_tag 'membership[role]', options_for_select(Membership::ROLES.keys.map { |r| [r.to_s.titleize, r] }), class: 'form-select', required: true %>
+              <% if @organization.owner_id == current_user.id || admin? %>
+                <%= select_tag 'membership[role]', options_for_select(Membership::ROLES.keys.map { |r| [r.to_s.titleize, r] }), class: 'form-select', required: true %>
+              <% elsif moderator? %>
+                <%= select_tag 'membership[role]', options_for_select([['Member', 'member']]), class: 'form-select', required: true %>
+              <% end %>
             </div>
             <div class="d-flex gap-2">
               <%= f.submit 'Add Member', class: 'btn btn-success' %>

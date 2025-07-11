@@ -15,4 +15,4 @@ class RoleManager
     membership = Membership.find_by(user: @user, organization: @organization)
     membership&.role
   end
-end 
+end

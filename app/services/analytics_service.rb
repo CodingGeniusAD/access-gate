@@ -19,7 +19,7 @@ class AnalyticsService
   end
 
   def new_members_this_month
-    @organization.memberships.where('created_at >= ?', Time.zone.now.beginning_of_month).count
+    @organization.memberships.where("created_at >= ?", Time.zone.now.beginning_of_month).count
   end
 
   def active_members_count
@@ -33,4 +33,4 @@ class AnalyticsService
   def recent_member_activity(limit = 5)
     @organization.memberships.includes(:user).order(updated_at: :desc).limit(limit)
   end
-end 
+end

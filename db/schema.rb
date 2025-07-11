@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_09_160248) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_10_171941) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_09_160248) do
     t.datetime "updated_at", null: false
     t.string "approval_token"
     t.index ["user_id"], name: "index_age_consents_on_user_id"
+  end
+
+  create_table "contents", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "body", null: false
+    t.string "content_type", default: "article", null: false
+    t.integer "age_group", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["age_group"], name: "index_contents_on_age_group"
+    t.index ["content_type", "age_group"], name: "index_contents_on_content_type_and_age_group"
+    t.index ["content_type"], name: "index_contents_on_content_type"
   end
 
   create_table "memberships", force: :cascade do |t|

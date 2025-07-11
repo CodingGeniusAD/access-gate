@@ -1,21 +1,21 @@
 module Users
   class RegistrationsController < Devise::RegistrationsController
-    before_action :configure_sign_up_params, only: [:create]
+    before_action :configure_sign_up_params, only: [ :create ]
 
     def create
       build_resource(sign_up_params)
-      
+
       # Basic date of birth validation
       unless valid_date_of_birth?
-        flash.now[:alert] = 'Please provide a valid date of birth.'
+        flash.now[:alert] = "Please provide a valid date of birth."
         clean_up_passwords resource
         set_minimum_password_length
         respond_with resource
         return
       end
-      
+
       resource.age_group = AgeVerifier.new(resource).call
-      
+
       if resource.age_group != :adult
         if parent_email_param.present?
           resource.save
@@ -23,7 +23,7 @@ module Users
           set_flash_message! :notice, :signed_up_but_consent
           redirect_to root_path and return
         else
-          flash.now[:alert] = 'Parental email required for users under 18.'
+          flash.now[:alert] = "Parental email required for users under 18."
           clean_up_passwords resource
           set_minimum_password_length
           respond_with resource
@@ -52,7 +52,7 @@ module Users
     protected
 
     def configure_sign_up_params
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:date_of_birth])
+      devise_parameter_sanitizer.permit(:sign_up, keys: [ :date_of_birth ])
     end
 
     private
@@ -64,17 +64,17 @@ module Users
     def parent_email_param
       params[:user][:parent_email]
     end
-    
+
     def valid_date_of_birth?
       return false unless resource.date_of_birth
-      
+
       # Check if date is in the future
       return false if resource.date_of_birth > Date.current
-      
+
       # Check if date is too far in the past (e.g., more than 120 years ago)
       return false if resource.date_of_birth < 120.years.ago.to_date
-      
+
       true
     end
   end
-end 
+end

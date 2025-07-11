@@ -21,6 +21,10 @@ class User < ApplicationRecord
     self[:age_group] = AGE_GROUPS[value.to_sym]
   end
 
+  def age_group_value
+    self[:age_group]
+  end
+
   def child?
     self[:age_group] == AGE_GROUPS[:child]
   end
@@ -46,7 +50,7 @@ class User < ApplicationRecord
 
   def date_of_birth_reasonable
     return unless date_of_birth
-    
+
     if date_of_birth > Date.current
       errors.add(:date_of_birth, "cannot be in the future")
     elsif date_of_birth < 120.years.ago.to_date

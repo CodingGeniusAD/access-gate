@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  get "age_consents/approve", to: 'age_consents#approve', as: :approve_age_consent
-  get "age_consents/deny", to: 'age_consents#deny', as: :deny_age_consent
+  get "age_consents/approve", to: "age_consents#approve", as: :approve_age_consent
+  get "age_consents/deny", to: "age_consents#deny", as: :deny_age_consent
   get "organizations/index"
   get "organizations/show"
   get "organizations/new"
@@ -9,14 +9,25 @@ Rails.application.routes.draw do
   get "organizations/update"
   get "organizations/destroy"
   get "home/index"
-  devise_for :users, controllers: { registrations: 'users/registrations' }
-  root to: 'home#index'
+  devise_for :users, controllers: { registrations: "users/registrations" }
+  root to: "home#index"
+
   resources :organizations do
+    member do
+      post :request_membership
+    end
     resources :organization_members do
+      member do
+        patch :approve_request
+        patch :reject_request
+      end
       post :transfer_ownership, on: :collection
     end
   end
-  resource :age_participation, only: [:show]
+
+  resources :contents
+  resource :age_participation, only: [ :show ]
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

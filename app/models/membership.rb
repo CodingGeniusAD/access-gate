@@ -12,7 +12,11 @@ class Membership < ApplicationRecord
   end
 
   def role=(value)
-    self[:role] = ROLES[value.to_sym]
+    if value.is_a?(Integer)
+      self[:role] = value
+    else
+      self[:role] = ROLES[value.to_sym]
+    end
   end
 
   def admin?
@@ -32,7 +36,11 @@ class Membership < ApplicationRecord
   end
 
   def status=(value)
-    self[:status] = STATUSES[value.to_sym]
+    if value.is_a?(Integer)
+      self[:status] = value
+    else
+      self[:status] = STATUSES[value.to_sym]
+    end
   end
 
   def pending?

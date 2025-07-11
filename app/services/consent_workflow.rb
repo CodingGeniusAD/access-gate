@@ -24,4 +24,4 @@ class ConsentWorkflow
     consent.save!
     true
   end
-end 
+end

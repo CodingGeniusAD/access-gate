@@ -1,12 +1,83 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-10">
       <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h1 class="mb-0">Age-Appropriate Content</h1>
+        </div>
         <div class="card-body">
-          <h1 class="mb-4">Age-Based Content</h1>
-          <p class="lead">Your age group: <span class="badge bg-info text-dark"><%= current_user.age_group %></span></p>
-          <p class="fw-bold">Filtered content:</p>
-          <pre class="bg-light p-3 rounded border"><%= @content %></pre>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5>Your Profile</h5>
+              <p class="lead">Age group: <span class="badge bg-info text-dark"><%= current_user.age_group.capitalize %></span></p>
+              <p>You can access content suitable for: <strong><%= current_user.age_group == :adult ? "All ages" : current_user.age_group == :teen ? "Children and teens" : "Children only" %></strong></p>
+            </div>
+            <div class="col-md-6">
+              <h5>Content Summary</h5>
+              <ul class="list-unstyled">
+                <li>📚 Total accessible content: <strong><%= @content_summary[:total_accessible] %></strong></li>
+                <li>👶 Child content: <strong><%= @content_summary[:child_content] %></strong></li>
+                <li>🧑‍🎓 Teen content: <strong><%= @content_summary[:teen_content] %></strong></li>
+                <li>👨‍💼 Adult content: <strong><%= @content_summary[:adult_content] %></strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <% if @content_summary[:can_create_content] %>
+            <div class="alert alert-info">
+              <strong>Create Content:</strong> 
+              <%= link_to "Add new content", new_content_path, class: "btn btn-sm btn-primary" %>
+            </div>
+          <% end %>
+
+          <h4>Recommended for You</h4>
+          <div class="row mb-4">
+            <% @recommended_content.each do |content| %>
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title"><%= content.title %></h6>
+                    <p class="card-text"><%= truncate(content.body, length: 100) %></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge bg-secondary"><%= content.content_type %></span>
+                      <span class="badge bg-warning text-dark"><%= content.age_restriction_text %></span>
+                    </div>
+                    <%= link_to "Read more", content_path(content), class: "btn btn-sm btn-outline-primary mt-2" %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <h4>All Accessible Content</h4>
+          <div class="row">
+            <% @accessible_content.each do |content| %>
+              <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title"><%= content.title %></h6>
+                    <p class="card-text"><%= truncate(content.body, length: 80) %></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge bg-secondary"><%= content.content_type %></span>
+                      <span class="badge bg-warning text-dark"><%= content.age_restriction_text %></span>
+                    </div>
+                    <%= link_to "View", content_path(content), class: "btn btn-sm btn-outline-primary mt-2" %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <% if @accessible_content.empty? %>
+            <div class="alert alert-warning">
+              <strong>No content available yet.</strong> 
+              <% if @content_summary[:can_create_content] %>
+                Be the first to create some content!
+              <% else %>
+                Content will be available soon.
+              <% end %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

@@ -13,4 +13,4 @@ class MembershipVerifier
       status: membership.status
     }
   end
-end 
+end

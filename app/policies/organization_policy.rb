@@ -1,10 +1,12 @@
 class OrganizationPolicy < ApplicationPolicy
   def index?
-    user.present?
+    # Allow public access to view all organizations
+    true
   end
 
   def show?
-    user.present? && member_or_higher?
+    # Allow public access to organization details
+    true
   end
 
   def create?
@@ -24,15 +26,35 @@ class OrganizationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    owner? || admin?
+    owner?
   end
 
   def manage_members?
     owner? || admin?
   end
 
+  def view_members?
+    owner? || admin? || moderator?
+  end
+
+  def view_analytics?
+    owner? || admin? || moderator?
+  end
+
+  def manage_content?
+    owner? || admin? || moderator?
+  end
+
   def transfer_ownership?
     owner?
+  end
+
+  def manage_admins?
+    owner? || admin?
+  end
+
+  def request_membership?
+    user.present? && !member_or_higher?
   end
 
   private
@@ -59,4 +81,4 @@ class OrganizationPolicy < ApplicationPolicy
   def member_or_higher?
     owner? || admin? || moderator? || member?
   end
-end 
+end
